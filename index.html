@@ -1,20 +1,67 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>My AI Video App</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EraPop - AI Video Maker</title>
 <style>
-body{background:#111;color:white;text-align:center;font-family:sans-serif;padding:20px}
-.box{background:#222;padding:20px;border-radius:15px;max-width:400px;margin:auto}
-input{width:90%;padding:15px;border-radius:10px;border:none;margin:15px 0}
-button{background:#7c3aed;color:white;padding:15px;width:100%;border:none;border-radius:10px;font-size:18px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:white;font-family:sans-serif;min-height:100vh;padding:20px}
+h1{text-align:center;margin:20px 0;font-size:28px}
+.card{background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);padding:25px;border-radius:20px;max-width:450px;margin:20px auto;border:1px solid rgba(255,255,255,0.2)}
+label{display:block;text-align:left;margin:10px 0 5px;font-size:14px;color:#ccc}
+input{width:100%;padding:14px;border-radius:12px;border:none;background:#1a1a2e;color:white;font-size:15px;outline:none}
+button{width:100%;padding:16px;margin-top:20px;border-radius:12px;border:none;background:linear-gradient(90deg,#7c3aed,#ec4899);color:white;font-size:18px;font-weight:bold;cursor:pointer}
+button:active{transform:scale(0.98)}
+#status{margin-top:15px;padding:10px;background:rgba(0,0,0,0.3);border-radius:8px;font-size:14px;min-height:20px}
+video{width:100%;margin-top:20px;border-radius:12px;display:none;background:black}
+.small{font-size:11px;color:#aaa;margin-top:15px;text-align:center}
+.small a{color:#a78bfa}
 </style>
 </head>
 <body>
-<h1>AI Video Maker</h1>
-<div class="box">
-<input id="prompt" placeholder="Prompt likho...">
-<button onclick="alert('App Ready! Ab Replicate API Key lagani hai')">Generate Video</button>
+<h1>🎬 EraPop Video Maker</h1>
+<div class="card">
+<label>1. Replicate API Key (Free):</label>
+<input id="apiKey" type="password" placeholder="r8_... paste here">
+<label>2. Video Prompt Likho:</label>
+<input id="prompt" type="text" placeholder="Old man making mini mosque near Kaaba, 4k">
+<button onclick="generate()">Generate Video ✨</button>
+<div id="status">API Key: replicate.com pe jao > Account > API Tokens > Copy</div>
+<video id="vid" controls loop></video>
+<p class="small">API Key free milti hai. <a href="https://replicate.com" target="_blank">replicate.com</a> pe account banao.<br>Ye app aapki hai - walikh495-prog.github.io</p>
 </div>
+<script>
+async function generate(){
+ const key=document.getElementById('apiKey').value.trim();
+ const prompt=document.getElementById('prompt').value.trim();
+ const status=document.getElementById('status');
+ const vid=document.getElementById('vid');
+ if(!key){alert('Pehle Replicate API Key dalo! replicate.com se milegi');return}
+ if(!prompt){alert('Prompt likho!');return}
+ status.innerText="⏳ Model start ho raha hai... 30 sec lagega...";
+ vid.style.display="none";
+ try{
+  let r=await fetch('https://api.replicate.com/v1/predictions',{
+   method:'POST',
+   headers:{'Authorization':'Token '+key,'Content-Type':'application/json'},
+   body:JSON.stringify({version:"8beff3369e0d1e96d1807074082476b6c5ff6f50eada1501cc1d54e9d034c1",input:{prompt:prompt}})
+  });
+  let d=await r.json();
+  if(!d.id){status.innerText="❌ Error: "+JSON.stringify(d);return}
+  let id=d.id;
+  let poll=setInterval(async()=>{
+   let res=await fetch('https://api.replicate.com/v1/predictions/'+id,{headers:{'Authorization':'Token '+key}});
+   let j=await res.json();
+   status.innerText="⏳ Status: "+j.status+" ...";
+   if(j.status==='succeeded'){
+    clearInterval(poll);
+    status.innerText="✅ Video Ready! Neeche dekho";
+    vid.src=j.output; vid.style.display="block"; vid.play();
+   }else if(j.status==='failed'){clearInterval(poll); status.innerText="❌ Failed: "+j.error;}
+  },3500);
+ }catch(e){status.innerText="❌ Error: "+e.message}
+}
+</script>
 </body>
 </html>
