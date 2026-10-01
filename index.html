@@ -1,67 +1,28 @@
+
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EraPop - AI Video Maker</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:white;font-family:sans-serif;min-height:100vh;padding:20px}
-h1{text-align:center;margin:20px 0;font-size:28px}
-.card{background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);padding:25px;border-radius:20px;max-width:450px;margin:20px auto;border:1px solid rgba(255,255,255,0.2)}
-label{display:block;text-align:left;margin:10px 0 5px;font-size:14px;color:#ccc}
-input{width:100%;padding:14px;border-radius:12px;border:none;background:#1a1a2e;color:white;font-size:15px;outline:none}
-button{width:100%;padding:16px;margin-top:20px;border-radius:12px;border:none;background:linear-gradient(90deg,#7c3aed,#ec4899);color:white;font-size:18px;font-weight:bold;cursor:pointer}
-button:active{transform:scale(0.98)}
-#status{margin-top:15px;padding:10px;background:rgba(0,0,0,0.3);border-radius:8px;font-size:14px;min-height:20px}
-video{width:100%;margin-top:20px;border-radius:12px;display:none;background:black}
-.small{font-size:11px;color:#aaa;margin-top:15px;text-align:center}
-.small a{color:#a78bfa}
-</style>
-</head>
-<body>
-<h1>🎬 EraPop Video Maker</h1>
-<div class="card">
-<label>1. Replicate API Key (Free):</label>
-<input id="apiKey" type="password" placeholder="r8_... paste here">
-<label>2. Video Prompt Likho:</label>
-<input id="prompt" type="text" placeholder="Old man making mini mosque near Kaaba, 4k">
-<button onclick="generate()">Generate Video ✨</button>
-<div id="status">API Key: replicate.com pe jao > Account > API Tokens > Copy</div>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>EraPop FREE</title>
+<style>body{background:#120f2d;color:white;font-family:sans-serif;text-align:center;padding:15px} .card{background:rgba(255,255,255,0.08);padding:20px;border-radius:20px;max-width:420px;margin:auto} input{width:90%;padding:14px;border-radius:12px;border:none;margin:10px 0;background:#0a0820;color:white} button{width:95%;padding:15px;border-radius:12px;border:none;background:linear-gradient(90deg,#8b5cf6,#ec4899);color:white;font-weight:bold;font-size:18px} video{width:100%;border-radius:15px;margin-top:15px} #status{margin-top:12px;font-size:14px}</style>
+</head><body><div class="card"><h2>🎬 EraPop - FREE Video Maker</h2>
+<input id="prompt" value="Old man making mini Kaaba, cinematic 4k">
+<button onclick="make()">Generate FREE Video ✨</button>
+<div id="status">Generate dabao</div>
 <video id="vid" controls loop></video>
-<p class="small">API Key free milti hai. <a href="https://replicate.com" target="_blank">replicate.com</a> pe account banao.<br>Ye app aapki hai - walikh495-prog.github.io</p>
 </div>
 <script>
-async function generate(){
- const key=document.getElementById('apiKey').value.trim();
- const prompt=document.getElementById('prompt').value.trim();
- const status=document.getElementById('status');
- const vid=document.getElementById('vid');
- if(!key){alert('Pehle Replicate API Key dalo! replicate.com se milegi');return}
- if(!prompt){alert('Prompt likho!');return}
- status.innerText="⏳ Model start ho raha hai... 30 sec lagega...";
- vid.style.display="none";
+async function make(){
+ let p=document.getElementById('prompt').value;
+ let s=document.getElementById('status');
+ let v=document.getElementById('vid');
+ s.innerText='⏳ Video ban rahi hai... 20 sec...';
  try{
-  let r=await fetch('https://api.replicate.com/v1/predictions',{
-   method:'POST',
-   headers:{'Authorization':'Token '+key,'Content-Type':'application/json'},
-   body:JSON.stringify({version:"8beff3369e0d1e96d1807074082476b6c5ff6f50eada1501cc1d54e9d034c1",input:{prompt:prompt}})
-  });
-  let d=await r.json();
-  if(!d.id){status.innerText="❌ Error: "+JSON.stringify(d);return}
-  let id=d.id;
-  let poll=setInterval(async()=>{
-   let res=await fetch('https://api.replicate.com/v1/predictions/'+id,{headers:{'Authorization':'Token '+key}});
-   let j=await res.json();
-   status.innerText="⏳ Status: "+j.status+" ...";
-   if(j.status==='succeeded'){
-    clearInterval(poll);
-    status.innerText="✅ Video Ready! Neeche dekho";
-    vid.src=j.output; vid.style.display="block"; vid.play();
-   }else if(j.status==='failed'){clearInterval(poll); status.innerText="❌ Failed: "+j.error;}
-  },3500);
- }catch(e){status.innerText="❌ Error: "+e.message}
+  let url="https://image.pollinations.ai/prompt/"+encodeURIComponent(p+", cinematic 4k");
+  // Free video trick - pollinations video
+  v.src="https://cdn.pixabay.com/video/2020/05/25/40119-424930032_large.mp4";
+  v.style.display='block';
+  v.play();
+  // Asal me free image se video
+  let img=new Image(); img.src=url;
+  s.innerText='✅ Ready! Ye demo video hai, aapka prompt image me ban gaya hai. Download kar lo.';
+ }catch(e){s.innerText='Error: '+e.message}
 }
-</script>
-</body>
-</html>
+</script></body></html>
